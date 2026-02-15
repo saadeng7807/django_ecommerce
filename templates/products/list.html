@@ -77,7 +77,7 @@
         <h5 class="card-title fw-bold text-dark mb-2">{{ product.name }}</h5>
         
         <div class="mb-3 mt-auto">
-            <span class="price-tag d-block text-primary fs-4 fw-bold">{{ product.price }} ر.س</span>
+            <span class="price-tag d-block text-primary fs-4 fw-bold">{{ product.price|floatformat:2 }} ر.س</span>
         </div>
 
         <button class="btn btn-primary btn-buy w-100 py-2">

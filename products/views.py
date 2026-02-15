@@ -1,5 +1,5 @@
 from django.shortcuts import render
-
+from .models import Product
 # Create your views here.
 
 
@@ -47,21 +47,35 @@ from django.shortcuts import render
 #     return render(request,'products/list.html',context)
 
 
-def list(request):
-   
-    
-   
 
-    cat_id=request.GET.get('category_id')
+#============== Exampe No 1 ====================
+# def list(request):
+#     product=Product.objects.all() #قراءة البيانات من database 
+
+#     context={
+#         "prod":product
+#     }
+
+
+#     return render(request,"products/list.html",context)
+
+
+
+
+def list(request):
+ 
+    cat_id=request.GET.get("category_id")
 
     if cat_id:
-        filterd_products=[p for p in products  if p["category_id"]==int(cat_id)]
-    else:
-        filterd_products=products
-    
+        f_product=Product.objects.filter(Category_id=cat_id)
+    else :
+        f_product=Product.objects.all()
+
+   
 
     context={
-        'prod':filterd_products
+        "prod":f_product
     }
 
-    return render(request,'products/list.html',context)
+
+    return render(request,"products/list.html",context)
