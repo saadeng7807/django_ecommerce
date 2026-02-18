@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from .models import Product
 # Create your views here.
 
@@ -62,20 +62,56 @@ from .models import Product
 
 
 
-def list(request):
+# def list(request):
  
-    cat_id=request.GET.get("category_id")
+#     cat_id=request.GET.get("category_id")
 
+#     if cat_id:
+#         f_product=Product.objects.filter(Category_id=cat_id)
+#     else :
+#         f_product=Product.objects.all()
+
+   
+
+#     context={
+#         "prod":f_product
+#     }
+
+
+#     return render(request,"products/list.html",context)
+
+def list(request):
+    print(request.session['m'])
+    tax=request.session['price']
+    request.session['value']="welcome"
+    tax=tax+(tax*(0.15))
+    request.session['price']=tax
+    cat_id=request.GET.get("category_id")
+    user=request.COOKIES.get('user')
+    print(user)
+    _search=request.GET.get("search")
+
+    products=Product.objects.all()
     if cat_id:
         f_product=Product.objects.filter(Category_id=cat_id)
     else :
         f_product=Product.objects.all()
 
-   
+        
+
+    if _search:
+        products=Product.objects.filter(name__icontains=_search)
 
     context={
-        "prod":f_product
+        "prod":products,
+        
+       
     }
 
-
+    
     return render(request,"products/list.html",context)
+
+
+def add_to_cart(request):
+    request.session['cart_count']=10
+    return redirect(request.META.get('HTTP_REFERER', '/')) # عدم تحويل المستخدم الى اي صفحة اخرى
