@@ -22,5 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('',cat.index),
     path('list/',prod.list,name='list'),
-    path('add_to_cart/',prod.add_to_cart,name='add_to_cart')
+    path('add_to_cart/',prod.add_to_cart,name='add_to_cart'),
+    path('details/<int:product_id>/',prod.product_details,name='details')
 ]
