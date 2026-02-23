@@ -12,6 +12,18 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+    
+class ProductDetail(models.Model):
+    description=models.TextField()
+    brand=models.CharField(max_length=100)
+    stock=models.IntegerField(default=0)
+    product=models.OneToOneField(Product,on_delete=models.CASCADE,related_name='details')
+
+    def __str__(self):
+        return self.brand
+
+
+
 
 
 

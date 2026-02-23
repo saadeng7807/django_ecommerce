@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from .models import Product
 # Create your views here.
 
@@ -112,6 +112,81 @@ def list(request):
     return render(request,"products/list.html",context)
 
 
-def add_to_cart(request):
-    request.session['cart_count']=10
+
+def product_details(request,product_id):
+
+    product = get_object_or_404(
+        Product.objects.select_related('details'),
+        id=product_id
+    )
+    print(Product)
+
+    context={
+        "product":product
+    }
+
+    return render(request,"products/product_info.html",context)
+
+def cart_view(request):
+    cart=request.session.get('cart',{})  # جلب المنتجات 
+    context={
+        "cart":cart
+    }
+    return render(request,"products/cart.html",context)
+
+
+def checkout(request):
+    
+    return render(request,"products/checkout.html")
+
+def auth_login(request):
+
+    pass 
+
+
+def auth_register(request):
+    
+    pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def add_to_cart(request,pid):
+   
+    prod = get_object_or_404(Product, pk=pid)
+
+    cart=request.session.get('cart',{})  # جلب المنتجات 
+   
+    #product_id=str(Product.id)
+
+    if pid in cart:
+        cart[pid]['quantity'] +=1
+    else:
+        cart[pid]={
+            'id': pid,
+            'name': prod.name,
+            'price': float(prod.price),
+            'quantity':1
+
+        }
+
+    request.session['cart']=cart
+    
+    counter=request.session.get('cart_count',0)
+    counter +=1
+    request.session['cart_count']=counter
     return redirect(request.META.get('HTTP_REFERER', '/')) # عدم تحويل المستخدم الى اي صفحة اخرى
