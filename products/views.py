@@ -1,5 +1,10 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from .models import Product
+from .forms import ContactForm
+from django.contrib import messages
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 
@@ -134,7 +139,7 @@ def cart_view(request):
     }
     return render(request,"products/cart.html",context)
 
-
+@login_required
 def checkout(request):
     
     return render(request,"products/checkout.html")
@@ -189,4 +194,44 @@ def add_to_cart(request,pid):
     counter=request.session.get('cart_count',0)
     counter +=1
     request.session['cart_count']=counter
-    return redirect(request.META.get('HTTP_REFERER', '/')) # عدم تحويل المستخدم الى اي صفحة اخرى
+    return redirect(request.META.get('HTTP_REFERER', '/')) 
+
+
+def auth_login(request):
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect("checkout")
+    else:
+        form = AuthenticationForm()
+
+    return render(request, "accounts/login.html", {"form": form})
+
+
+
+
+def register(request):
+    pass
+
+def contact(request):
+    form=ContactForm()
+    
+    if request.method=="POST":
+        form=ContactForm(request.POST)
+        if form.is_valid():
+           # حفظ البيانات في الجدول 
+           messages.success(request, 'تم إرسال رسالتك بنجاح! شكراً لتواصلك معنا.')
+           messages.success(request, 'سعداء لتواصلك معنا ')
+           return render(request,'contact.html',{'form':ContactForm(),
+                'success':True
+                })
+        else:
+             messages.error(request, 'يرجى التأكد من صحة البيانات المرسلة ')
+        
+
+        form=ContactForm()
+
+    return render(request,'contact.html',{'form':form})
+
