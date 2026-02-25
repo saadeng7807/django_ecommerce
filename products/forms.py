@@ -1,5 +1,7 @@
 from django import forms 
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
+
 class ContactForm(forms.Form):
 
     name=forms.CharField(
@@ -36,22 +38,21 @@ class ContactForm(forms.Form):
 
 
 
-class RegisterForm(forms.Form):
-     email=forms.EmailField(
-       widget=forms.TextInput(attrs={
-           'class':'form-control',
-           'placeholder':'ادخل بريدك الإليكتروني'
-       })
+class RegisterForm(UserCreationForm):
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'ادخل بريدك الإلكتروني'
+        })
     )
-     
-     class Meta:
-          model=User
-          fields=["username","email","passowrd1","passowrd2"]
-          widget={
-               'username': forms.TextInput(attrs={'class':'form-control text-center'}),
-               'passowrd1': forms.PasswordInput(attrs={'class':'form-control text-center'}),
-               'passowrd2': forms.PasswordInput(attrs={'class':'form-control text-center'})
-          }
 
+    class Meta:
+        model = User
+        fields = ["username", "email", "password1", "password2"]
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control text-center'}),
+            'password1': forms.PasswordInput(attrs={'class': 'form-control text-center'}),
+            'password2': forms.PasswordInput(attrs={'class': 'form-control text-center'}),
+        }
 
 

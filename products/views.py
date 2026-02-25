@@ -1,10 +1,12 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from .models import Product
-from .forms import ContactForm
+from .forms import ContactForm,RegisterForm
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import login
+from django.contrib.auth import login,logout
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.conf import settings
 # Create your views here.
 
 
@@ -144,14 +146,16 @@ def checkout(request):
     
     return render(request,"products/checkout.html")
 
-def auth_login(request):
+def send_email(request,email):
+    send_mail(
+        'شركة المنار للتسويق الإليكتروني',
+        'تم استلام بريدك الإليكتروني وسيم معالجة طلبك خلال ثلاثة ايام عمل شكراً لتواصلكم',
+        settings.EMAIL_HOST_USER,
+        [email],
+        fail_silently=False
 
-    pass 
+    )
 
-
-def auth_register(request):
-    
-    pass
 
 
 
@@ -221,6 +225,8 @@ def contact(request):
     if request.method=="POST":
         form=ContactForm(request.POST)
         if form.is_valid():
+           email=form.cleaned_data['email']
+           send_email(request,email)
            # حفظ البيانات في الجدول 
            messages.success(request, 'تم إرسال رسالتك بنجاح! شكراً لتواصلك معنا.')
            messages.success(request, 'سعداء لتواصلك معنا ')
@@ -234,4 +240,23 @@ def contact(request):
         form=ContactForm()
 
     return render(request,'contact.html',{'form':form})
+
+def logout_view(request):
+    logout(request)
+    return redirect("/")
+
+
+def auth_register(request):
+    if request.method=="POST":
+        form=RegisterForm(request.POST)
+        if form.is_valid():
+            user=form.save()
+            login(request,user)
+            return redirect("list")
+    else:
+        form=RegisterForm()
+    return render(request,"accounts/register.html",{"form":form})
+
+    
+
 
