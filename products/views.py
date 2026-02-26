@@ -7,6 +7,11 @@ from django.contrib.auth import login,logout
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from datetime import datetime
+from django.http import HttpResponse
 # Create your views here.
 
 
@@ -147,14 +152,41 @@ def checkout(request):
     return render(request,"products/checkout.html")
 
 def send_email(request,email):
-    send_mail(
-        'شركة المنار للتسويق الإليكتروني',
-        'تم استلام بريدك الإليكتروني وسيم معالجة طلبك خلال ثلاثة ايام عمل شكراً لتواصلكم',
-        settings.EMAIL_HOST_USER,
-        [email],
-        fail_silently=False
+
+    subject="شركة المنار للتسويق الإليكتروني"
+    to_email=[email]
+    context={
+        'user_name':"عميلنا العزيز",
+        'year':datetime.now().year,
+    }
+
+    html_content=render_to_string("emails/email_send.html",context)
+    text_content=strip_tags(html_content)
+
+    email=EmailMultiAlternatives(
+        subject,
+        text_content,
+         settings.EMAIL_HOST_USER,
+         to_email
+
+
 
     )
+
+    email.attach_alternative(html_content, "text/html")
+
+    email.send( fail_silently=False)
+
+    return HttpResponse("تم ارسال البريد الإليكتروني بنجاح")
+    
+    # send_mail(
+    #     'شركة المنار للتسويق الإليكتروني',
+    #     'تم استلام بريدك الإليكتروني وسيم معالجة طلبك خلال ثلاثة ايام عمل شكراً لتواصلكم',
+    #     settings.EMAIL_HOST_USER,
+    #     [email],
+    #     fail_silently=False
+
+    # )
 
 
 
