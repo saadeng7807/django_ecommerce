@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from .models import Product
+from .models import Product,ProductDetail
 from .forms import ContactForm,RegisterForm
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
@@ -12,6 +12,11 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from datetime import datetime
 from django.http import HttpResponse
+from rest_framework import viewsets
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.response import Response
+from .serializers import ProductSerializer, ProductDetailSerializer
 # Create your views here.
 
 
@@ -91,6 +96,35 @@ from django.http import HttpResponse
 
 
 #     return render(request,"products/list.html",context)
+
+
+
+
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset=Product.objects.all()
+    serializer_class=ProductSerializer
+
+
+
+class ProductDetailsViewSet(viewsets.ModelViewSet):
+    queryset=ProductDetail.objects.all()
+    serializer_class=ProductDetailSerializer
+
+
+
+
+class ProductCreateAPIView(APIView):
+
+    def post(self, request):
+        serializer = ProductSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
 
 def list(request):
     print(request.session['m'])
